@@ -10,7 +10,8 @@ var semver = require('semver'),
       'src/dataset/persistent_storage.js',
       'src/dataset/transport.js',
       'src/dataset/search_index.js',
-      'src/dataset/dataset.js'
+      'src/dataset/dataset.js',
+      'src/dataset/tt_factory.js'
       ],
       typeahead: [
       'src/typeahead/html.js',
@@ -35,7 +36,7 @@ module.exports = function(grunt) {
     banner: [
       '/*!',
       ' * typeahead.js <%= version %>',
-      ' * https://github.com/twitter/typeahead',
+      ' * https://github.com/twitter/typeahead.js',
       ' * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT',
       ' */\n\n'
     ].join('\n'),

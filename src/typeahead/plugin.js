@@ -1,6 +1,6 @@
 /*
  * typeahead.js
- * https://github.com/twitter/typeahead
+ * https://github.com/twitter/typeahead.js
  * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT
  */
 
@@ -16,17 +16,22 @@
       return this.each(attach);
 
       function attach() {
-        var $input = $(this), typeahead;
+        var $input = $(this), sections, typeahead;
+
+        sections =  _.isArray(o.sections) ? o.sections : [o.sections];
+
+        // HACK: force highlight as a top-level config
+        _.each(sections, function(s) { s.highlight = !!o.highlight; });
 
         typeahead = new Typeahead({
           input: $input,
           withHint: _.isUndefined(o.hint) ? true : !!o.hint,
-          minLength: o.minLength || 0,
-          autoselect: !!o.autoselect,
-          // Created option to specify which datum key to display upon 
+          minLength: o.minLength,
+          autoselect: o.autoselect,
+          sections: sections
+		  // Created option to specify which datum key to display upon 
           // selection ( Defaults to value )
           displayKey: o.displayKey || 'value',
-          sections: _.isArray(o.sections) ? o.sections : [o.sections]
         });
 
         $input.data(typeaheadKey, typeahead);
@@ -58,7 +63,8 @@
     },
 
     val: function val(newVal) {
-      return _.isString(newVal) ? this.each(setQuery) : this.map(getQuery).get();
+      return _.isString(newVal) ?
+        this.each(setQuery) : this.map(getQuery).get();
 
       function setQuery() {
         var $input = $(this), typeahead;

@@ -1,6 +1,6 @@
 /*
  * typeahead.js
- * https://github.com/twitter/typeahead
+ * https://github.com/twitter/typeahead.js
  * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT
  */
 
@@ -24,8 +24,8 @@ var Section = (function() {
     this.highlight = !!o.highlight;
     this.name = o.name || _.getUniqueId();
 
-    this.source = setupSource(o.source);
-    this.valueKey = getValueKeyFromDataset(o.source) || o.valueKey || 'value';
+    this.source = o.source;
+    this.valueKey = o.valueKey || 'value';
 
     this.templates = getTemplates(o.templates, this.valueKey);
 
@@ -156,21 +156,6 @@ var Section = (function() {
 
   // helper functions
   // ----------------
-
-  // a valid source is either a function or a dataset instance
-  // when it's a dataset, grab its get method and bind it to itself
-  function setupSource(source) {
-    if (window.Dataset && source instanceof window.Dataset) {
-      source.initialize();
-      source = _.bind(source.get, source);
-    }
-
-    return source;
-  }
-
-  function getValueKeyFromDataset(source) {
-    return (Dataset && source instanceof Dataset) ? source.valueKey : null;
-  }
 
   function getTemplates(templates, valueKey) {
     valueKey = valueKey || 'value';

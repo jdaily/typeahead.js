@@ -1,10 +1,10 @@
 /*
  * typeahead.js
- * https://github.com/twitter/typeahead
+ * https://github.com/twitter/typeahead.js
  * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT
  */
 
-var Dataset = window.Dataset = (function() {
+var Dataset = (function() {
   var keys;
 
   keys = { data: 'data', protocol: 'protocol', thumbprint: 'thumbprint' };
@@ -20,8 +20,8 @@ var Dataset = window.Dataset = (function() {
     this.name = o.name || _.getUniqueId();
     this.limit = o.limit || 5;
     this.valueKey = o.valueKey || 'value';
-    this.dupChecker = getDupChecker(o.dupChecker);
     this.sorter = getSorter(o.sorter);
+    this.dupDetector = getDupDetector(o.dupDetector, this.valueKey);
 
     this.local = getLocal(o);
     this.prefetch = getPrefetch(o);
@@ -97,6 +97,8 @@ var Dataset = window.Dataset = (function() {
         value = _.isString(raw) ? raw : raw[that.valueKey];
         datum = { value: value, tokens: raw.tokens };
 
+        // if the raw datum is a string, transform it into an
+        // object as that's what gets passed to the precompiled templates
         _.isString(raw) ?
           (datum.raw = {})[that.valueKey] = raw :
           datum.raw = raw;
@@ -158,6 +160,8 @@ var Dataset = window.Dataset = (function() {
       normalized = this._normalize(data);
 
       this.index.add(normalized);
+
+      return this;
     },
 
     get: function get(query, cb) {
@@ -186,7 +190,7 @@ var Dataset = window.Dataset = (function() {
 
           // checks for duplicates
           isDuplicate = _.some(matchesWithBackfill, function(match) {
-            return that.dupChecker(remoteMatch, match);
+            return that.dupDetector(remoteMatch, match);
           });
 
           !isDuplicate && matchesWithBackfill.push(remoteMatch);
@@ -196,7 +200,7 @@ var Dataset = window.Dataset = (function() {
           return matchesWithBackfill.length < that.limit;
         });
 
-        cb && cb(matchesWithBackfill.sort(this.sorter));
+        cb && cb(matchesWithBackfill.sort(that.sorter));
       }
 
       function pickRaw(obj) { return obj.raw; }
@@ -214,15 +218,15 @@ var Dataset = window.Dataset = (function() {
     function defaultSorter() { return 0; }
   }
 
-  function getDupChecker(dupChecker) {
-    if (!_.isFunction(dupChecker)) {
-      dupChecker = dupChecker === false ? ignoreDups : standardDupChecker;
+  function getDupDetector(dupDetector, valueKey) {
+    if (!_.isFunction(dupDetector)) {
+      dupDetector = dupDetector === false ? ignoreDups : defaultDupDetector;
     }
 
-    return dupChecker;
+    return dupDetector;
 
     function ignoreDups() { return false; }
-    function standardDupChecker(a, b) { return a.value === b.value; }
+    function defaultDupDetector(a, b) { return a[valueKey] === b[valueKey]; }
   }
 
   function getLocal(o) {
