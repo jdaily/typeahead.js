@@ -28,10 +28,10 @@
           withHint: _.isUndefined(o.hint) ? true : !!o.hint,
           minLength: o.minLength,
           autoselect: o.autoselect,
-          sections: sections
-		  // Created option to specify which datum key to display upon 
+          sections: sections,
+          // Created option to specify which datum key to display upon
           // selection ( Defaults to value )
-          displayKey: o.displayKey || 'value',
+          displayKey: o.displayKey || 'value'
         });
 
         $input.data(typeaheadKey, typeahead);
